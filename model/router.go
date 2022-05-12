@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -13,8 +14,9 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/usuario", rest.HandlerUsuario)
+	router.HandleFunc("/usuario/{id}", rest.HandlerUsuario)
 
-	port := "8001"
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}

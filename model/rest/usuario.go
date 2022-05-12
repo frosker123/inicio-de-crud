@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func HandlerUsuario(w http.ResponseWriter, r *http.Request) {
@@ -60,5 +63,50 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 }
 
 func BuscaUsuarioById(w http.ResponseWriter, r *http.Request) {
+	paramentros := mux.Vars(r)
+	var usuario usuario.Usuario
+
+	id, err := strconv.ParseUint(paramentros["id"], 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("erro ao achar id"))
+		return
+	}
+	db, err := service.ConectaDB()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("erro ao fazer conexão com o banco de dados"))
+		return
+	}
+
+	row, err := db.Query("select * from usuarios.usuario where id = $1 ", id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("erro, id nao encontrado ou nao existe"))
+		return
+	}
+
+	if row.Next() {
+		if err := row.Scan(&usuario.ID, &usuario.Nome, &usuario.Email); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("erro ao retornar usuario o scan pra mostrar o usuario"))
+			return
+		}
+	}
+
+	if usuario.ID == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("erro, id nao encontrado ou nao existe"))
+		return
+	}
+
+	defer db.Close()
+
+	err = json.NewEncoder(w).Encode(usuario)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("erro ao converter usuario para json"))
+		return
+	}
 
 }

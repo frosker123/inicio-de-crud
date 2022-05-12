@@ -18,11 +18,11 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8000"
 	}
 
 	fmt.Printf("executando na porta %v\n", port)
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%v", port), router))
 
 }

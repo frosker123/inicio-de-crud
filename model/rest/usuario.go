@@ -7,9 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 func HandlerUsuario(w http.ResponseWriter, r *http.Request) {
@@ -47,64 +44,21 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	statement := `insert into usuarios.usuario(nome, email)values($1, $2)`
+	_, e := db.Exec(statement, usuario.Nome, usuario.Email)
+	if e != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("erro ao inserir usuario"))
+		return
+	}
+
 	defer db.Close()
 
-	sqlStatement, err := db.Prepare(`INSERT INTO usuarios.usuario (nome, email)VALUES ($1, $2)`)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("erro ao fazer o statement"))
-		return
-	}
-
-	defer sqlStatement.Close()
-
-	insertline, err := sqlStatement.Exec(sqlStatement, usuario.Nome, usuario.Email)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("erro ao fazer o inserir dado"))
-		return
-	}
-
-	inserirId, err := insertline.LastInsertId()
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("erro ao fazer o inserir id"))
-		return
-	}
-
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("novo usuario inserido com id %v", inserirId)))
+	w.Write([]byte(fmt.Sprintf("novo usuario inserido com sucesso")))
 
 }
 
 func BuscaUsuarioById(w http.ResponseWriter, r *http.Request) {
-	parametros := mux.Vars(r)
-	var usuario usuario.Usuario
 
-	id, err := strconv.ParseInt(parametros["id"], 10, 64)
-	if err != nil {
-		w.Write([]byte("erro ao mostrar id usuario"))
-		return
-	}
-
-	db, err := service.ConectaDB()
-	if err != nil {
-		w.Write([]byte("erro ao fazer conexão com o banco de dados"))
-		return
-	}
-
-	query, err := db.Query("select * from usuario id = ?", id)
-	if err != nil {
-		w.Write([]byte("erro ao buscar user"))
-	}
-
-	if query.Next() {
-		if err := query.Scan(&usuario.ID, &usuario.Nome, usuario.Email); err != nil {
-			w.Write([]byte("erro ao fazer scan do usuario"))
-		}
-	}
-
-	if err := json.NewEncoder(w).Encode(&usuario); err != nil {
-		w.Write([]byte("erro ao fazer encode"))
-	}
 }

@@ -27,7 +27,7 @@ func ConectaDB() (*sql.DB, error) {
 		panic(err)
 	}
 
-	fmt.Printf("consegui conectar no banco de dados :)")
+	fmt.Printf("conectou-se ao banco de dados postgres in docker :) \n")
 
 	return db, nil
 }

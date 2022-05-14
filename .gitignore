@@ -1,4 +1,3 @@
 
 // git ingore credenciais
-
-*.env
+.env

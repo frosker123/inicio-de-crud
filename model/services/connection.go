@@ -2,20 +2,15 @@ package service
 
 import (
 	"database/sql"
+	congif "ec2/model/config"
 	"fmt"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // import do drive do postgres, ele nao é usado nesse pacote por isso tem que definir ele como import explicito, usando o _ na frente do pacote
 )
 
 func ConectaDB() (*sql.DB, error) {
-	var (
-		HOST     = "localhost"
-		PORT     = 5432
-		USER     = "postgres"
-		PASSWORD = 12345
-		DB_NAME  = "postgresql"
-	)
-	conect := fmt.Sprintf("host=%s port=%d user=%s password=%v dbname=%s sslmode=disable ", HOST, PORT, USER, PASSWORD, DB_NAME)
+	congif.VariveisAm()
+	conect := fmt.Sprintf("host=%s port=%d user=%s password=%v dbname=%s sslmode=disable ", congif.HOST, congif.DB_PORT, congif.DB_USER, congif.PASSWORD, congif.DB_NAME)
 
 	db, err := sql.Open("postgres", conect)
 	if err != nil {

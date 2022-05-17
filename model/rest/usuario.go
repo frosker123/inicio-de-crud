@@ -5,6 +5,7 @@ import (
 	"ec2/model/loggers"
 	usuario "ec2/model/modelos"
 	"ec2/model/repository"
+	"ec2/model/validate"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -38,9 +39,15 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &usuario)
 	if err != nil {
 		err = errors.New("erro ao fazer unmarshal")
-		w.Write([]byte("erro ao fazer unmarshal do usuario"))
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
+
+	if err = validate.Valid(&usuario); err != nil {
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
 	db, err := service.ConectaDB()
 	if err != nil {
 		err = errors.New("erro conectar no db")

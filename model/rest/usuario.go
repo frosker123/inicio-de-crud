@@ -1,8 +1,9 @@
 package rest
 
 import (
-	service "ec2/model/services"
-	"ec2/model/usuario"
+	service "ec2/model/banco"
+	usuario "ec2/model/modelos"
+	"ec2/model/repository"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -28,30 +29,28 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+
 		w.Write([]byte("falha ao ler body da request"))
 		return
 	}
-
 	err = json.Unmarshal(body, &usuario)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+
 		w.Write([]byte("erro ao fazer unmarshal do usuario"))
 		return
 	}
-
 	db, err := service.ConectaDB()
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+
 		w.Write([]byte("erro ao fazer conexão com o banco de dados"))
 		return
 	}
 
-	statement := `insert into usuarios.usuario(nome, email)values($1, $2)`
-	_, e := db.Exec(statement, usuario.Nome, usuario.Email)
-	if e != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("erro ao inserir usuario"))
+	repository := repository.NewRepositorio(db)
+	_, err = repository.Criar(usuario)
+	if err != nil {
+
+		w.Write([]byte("erro ao criar usuario"))
 		return
 	}
 
@@ -68,34 +67,34 @@ func BuscaUsuarioById(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.ParseUint(paramentros["id"], 10, 64)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+
 		w.Write([]byte("erro ao achar id"))
 		return
 	}
 	db, err := service.ConectaDB()
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+
 		w.Write([]byte("erro ao fazer conexão com o banco de dados"))
 		return
 	}
 
-	row, err := db.Query("select * from usuarios.usuario where id = $1 ", id)
+	row, err := db.Query("select * from usuarios.usuarios where id = $1 ", id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+
 		w.Write([]byte("erro, id nao encontrado ou nao existe"))
 		return
 	}
 
 	if row.Next() {
-		if err := row.Scan(&usuario.ID, &usuario.Nome, &usuario.Email); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+		if err := row.Scan(&usuario.ID, &usuario.Nome, &usuario.UserName, &usuario.Email, &usuario.Password); err != nil {
+
 			w.Write([]byte("erro ao retornar usuario o scan pra mostrar o usuario"))
 			return
 		}
 	}
 
 	if usuario.ID == 0 {
-		w.WriteHeader(http.StatusBadRequest)
+
 		w.Write([]byte("erro, id nao encontrado ou nao existe"))
 		return
 	}
@@ -104,7 +103,7 @@ func BuscaUsuarioById(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(usuario)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+
 		w.Write([]byte("erro ao converter usuario para json"))
 		return
 	}

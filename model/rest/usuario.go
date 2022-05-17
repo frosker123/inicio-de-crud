@@ -2,9 +2,11 @@ package rest
 
 import (
 	service "ec2/model/banco"
+	"ec2/model/loggers"
 	usuario "ec2/model/modelos"
 	"ec2/model/repository"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -29,35 +31,34 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-
-		w.Write([]byte("falha ao ler body da request"))
+		err = errors.New("erro ao ler o body")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
 	err = json.Unmarshal(body, &usuario)
 	if err != nil {
-
+		err = errors.New("erro ao fazer unmarshal")
 		w.Write([]byte("erro ao fazer unmarshal do usuario"))
 		return
 	}
 	db, err := service.ConectaDB()
 	if err != nil {
-
-		w.Write([]byte("erro ao fazer conexão com o banco de dados"))
+		err = errors.New("erro conectar no db")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
 
 	repository := repository.NewRepositorio(db)
 	_, err = repository.Criar(usuario)
 	if err != nil {
-
-		w.Write([]byte("erro ao criar usuario"))
+		err = errors.New("erro ao criar usuario")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
 
 	defer db.Close()
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("novo usuario inserido com sucesso")))
+	loggers.ResponseJson(w, http.StatusOK, fmt.Sprintf("usuario inserido com sucesso %v", usuario))
 
 }
 

@@ -17,6 +17,7 @@ func main() {
 	router.HandleFunc("/usuario", rest.HandlerUsuario)
 	router.HandleFunc("/usuario/{id}", rest.HandlerUsuario)
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", congif.API_PORT), router))
+	fmt.Printf("api rodando na porta %v", congif.API_PORT)
 
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", congif.API_PORT), router))
 }

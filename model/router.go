@@ -15,6 +15,7 @@ func main() {
 	congif.VariveisAm()
 
 	router.HandleFunc("/usuario", rest.HandlerUsuario)
+	router.HandleFunc("/usuario/{id}", rest.HandlerUsuario)
 	router.HandleFunc("/usuario/{id}", rest.BuscaUsuarioById)
 
 	fmt.Printf("api rodando na porta %v\n", congif.API_PORT)

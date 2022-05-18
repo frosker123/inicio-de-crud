@@ -3,7 +3,7 @@ package usuario
 import "time"
 
 type Usuario struct {
-	ID          int64     `json:"Erros,omitempty"`
+	ID          int64     `json:"Id,omitempty"`
 	Nome        string    `json:"Nome,omitempty"`
 	UserName    string    `json:"UserName,omitempty"`
 	Email       string    `json:"Email,omitempty"`

@@ -11,6 +11,7 @@ type Errors struct {
 }
 
 func ResponseJson(w http.ResponseWriter, statuscode int, dados interface{}) {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statuscode)
 
 	if err := json.NewEncoder(w).Encode(dados); err != nil {

@@ -60,7 +60,7 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repository := repositorio.NewRepositorio(db)
-	_, err = repository.Criar(user)
+	_, err = repository.Create(user)
 	if err != nil {
 		err = errors.New("erro ao criar usuario")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
@@ -84,7 +84,7 @@ func BuscaUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repository := repositorio.NewRepositorio(db)
-	querier, err := repository.Querie(nikeouName)
+	querier, err := repository.Get(nikeouName)
 	if err != nil {
 		err = errors.New("erro no filtro de usuario")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)

@@ -14,7 +14,7 @@ func NewRepositorio(db *sql.DB) *repositorio {
 	return &repositorio{db}
 }
 
-func (repo repositorio) Criar(user usuario.Usuario) (int64, error) {
+func (repo repositorio) Create(user usuario.Usuario) (int64, error) {
 	statement := `insert into usuarios.usuarios(nome, username, email, password, created_at)values($1, $2, $3, $4,$5)`
 	_, err := repo.db.Exec(statement, user.Nome, user.UserName, user.Email, user.Password, user.DataCriacao)
 	if err != nil {
@@ -23,7 +23,7 @@ func (repo repositorio) Criar(user usuario.Usuario) (int64, error) {
 	return user.ID, nil
 }
 
-func (repo repositorio) Querie(nikeouName string) ([]usuario.Usuario, error) {
+func (repo repositorio) Get(nikeouName string) ([]usuario.Usuario, error) {
 	nikeouName = fmt.Sprintf("%%s%%")
 	var usuarios []usuario.Usuario
 
@@ -81,4 +81,24 @@ func (repo repositorio) AttUser(id int64, user usuario.Usuario) error {
 	}
 
 	return nil
+}
+
+func (repo repositorio) Login(email string) (usuario.Usuario, error) {
+	var user usuario.Usuario
+
+	row, err := repo.db.Query("select id, password from usuarios.usuarios where email = $1", email)
+	if err != nil {
+		return usuario.Usuario{}, err
+	}
+
+	if row.Next() {
+		if err = row.Scan(
+			&user.ID,
+			&user.Password,
+		); err != nil {
+			return usuario.Usuario{}, nil
+		}
+	}
+
+	return user, nil
 }

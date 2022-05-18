@@ -80,7 +80,7 @@ func Hash(password string) (string, error) {
 	}
 	return string(senha), nil
 }
-func CheckPasswordHash(password, hash string) bool {
+func CheckPasswordHash(password, hash string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil // nota erro for == nil , e true e != nil é false
+	return err // nota erro for == nil , e true e != nil é false
 }

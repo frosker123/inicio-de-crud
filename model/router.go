@@ -14,9 +14,13 @@ func main() {
 	router := mux.NewRouter()
 	congif.VariveisAm()
 
+	//usuario
 	router.HandleFunc("/usuario", rest.HandlerUsuario)
 	router.HandleFunc("/usuario/{id}", rest.HandlerUsuario)
 	router.HandleFunc("/usuario/{id}", rest.BuscaUsuarioById)
+
+	//login
+	router.HandleFunc("/login", rest.HandlerLogin)
 
 	fmt.Printf("api rodando na porta %v\n", congif.API_PORT)
 

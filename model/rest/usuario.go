@@ -32,7 +32,7 @@ func HandlerUsuario(w http.ResponseWriter, r *http.Request) {
 }
 
 func InserirUsuario(w http.ResponseWriter, r *http.Request) {
-	var usuario usuario.Usuario
+	var user usuario.Usuario
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -40,14 +40,14 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
-	err = json.Unmarshal(body, &usuario)
+	err = json.Unmarshal(body, &user)
 	if err != nil {
 		err = errors.New("erro ao fazer unmarshal")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if err = validate.Valid(&usuario); err != nil {
+	if err = validate.Valid(&user, "inserir"); err != nil {
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
@@ -60,7 +60,7 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repository := repositorio.NewRepositorio(db)
-	_, err = repository.Criar(usuario)
+	_, err = repository.Criar(user)
 	if err != nil {
 		err = errors.New("erro ao criar usuario")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
@@ -69,7 +69,7 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 
 	defer db.Close()
 
-	loggers.ResponseJson(w, http.StatusOK, usuario)
+	loggers.ResponseJson(w, http.StatusOK, user)
 
 }
 
@@ -149,6 +149,11 @@ func PutUsuario(w http.ResponseWriter, r *http.Request) {
 	db, err := service.ConectaDB()
 	if err != nil {
 		err = errors.New("erro ao conectar no banco")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err = validate.Valid(&att, "atualiza"); err != nil {
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}

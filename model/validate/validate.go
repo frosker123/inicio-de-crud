@@ -3,6 +3,7 @@ package validate
 import (
 	usuario "ec2/model/modelos"
 	"errors"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -29,6 +30,11 @@ func validateCampo(user *usuario.Usuario) error {
 		return errors.New("campo email tem que ser preenchido")
 	}
 
+	err := IsEmailValid(user.Email)
+	if !err {
+		return errors.New("o email informado é invalido")
+	}
+
 	if user.Password == "" {
 		return errors.New("campo senha tem que ser preenchido")
 	}
@@ -43,4 +49,9 @@ func formate(user *usuario.Usuario) {
 	user.Email = strings.TrimSpace(user.Email)
 	user.Nome = strings.TrimSpace(user.Nome)
 
+}
+
+func IsEmailValid(email string) bool {
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	return emailRegex.MatchString(email)
 }

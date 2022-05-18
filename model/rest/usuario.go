@@ -25,6 +25,10 @@ func HandlerUsuario(w http.ResponseWriter, r *http.Request) {
 		BuscaUsuario(w, r)
 	}
 
+	if r.Method == http.MethodPut {
+		PutUsuario(w, r)
+	}
+
 }
 
 func InserirUsuario(w http.ResponseWriter, r *http.Request) {
@@ -121,4 +125,41 @@ func BuscaUsuarioById(w http.ResponseWriter, r *http.Request) {
 
 	loggers.ResponseJson(w, http.StatusOK, buscabyID)
 
+}
+
+func PutUsuario(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	att := usuario.Usuario{
+		Nome:     r.FormValue("nome"),
+		UserName: r.FormValue("username"),
+		Email:    r.FormValue("email"),
+		Password: r.FormValue("password"),
+	}
+
+	id := params["id"]
+
+	idUser, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		err = errors.New("erro ao converter id para um int")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err := service.ConectaDB()
+	if err != nil {
+		err = errors.New("erro ao conectar no banco")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	repository := repositorio.NewRepositorio(db)
+	err = repository.AttUser(idUser, att)
+	if err != nil {
+		err = errors.New("erro ao atualizar usuario")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	loggers.ResponseJson(w, http.StatusOK, "usuario atualizado :)")
 }

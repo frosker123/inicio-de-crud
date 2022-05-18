@@ -71,3 +71,14 @@ func (repo repositorio) GetbyId(id int64) (usuario.Usuario, error) {
 
 	return user, nil
 }
+
+func (repo repositorio) AttUser(id int64, user usuario.Usuario) error {
+
+	statement := `update usuarios.usuarios set nome = $1, username = $2, email = $3, password = $4 where id = $5`
+	_, err := repo.db.Exec(statement, user.Nome, user.UserName, user.Email, user.Password, id)
+	if err != nil {
+		panic(err)
+	}
+
+	return nil
+}

@@ -8,4 +8,7 @@ require (
 	github.com/subosito/gotenv v1.2.0
 )
 
-require github.com/stretchr/testify v1.7.1 // indirect
+require (
+	github.com/badoux/checkmail v1.2.1 // indirect
+	github.com/stretchr/testify v1.7.1 // indirect
+)

@@ -4,6 +4,7 @@ import (
 	usuario "ec2/model/modelos"
 	"errors"
 	"strings"
+	"time"
 )
 
 func Valid(user *usuario.Usuario) error {
@@ -31,6 +32,9 @@ func validateCampo(user *usuario.Usuario) error {
 	if user.Password == "" {
 		return errors.New("campo senha tem que ser preenchido")
 	}
+
+	user.DataCriacao = time.Now()
+
 	return nil
 }
 

@@ -27,3 +27,9 @@ func ResponseErrors(w http.ResponseWriter, statuscode int, err error) {
 	})
 
 }
+
+func ResponseText(w http.ResponseWriter, statuscode int, text string) {
+	if text != "" {
+		w.Write([]byte(text))
+	}
+}

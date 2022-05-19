@@ -2,6 +2,7 @@ package main
 
 import (
 	congif "ec2/model/config"
+	"ec2/model/midllewares"
 	"ec2/model/rest"
 	"fmt"
 	"log"
@@ -11,13 +12,14 @@ import (
 )
 
 func main() {
+
 	router := mux.NewRouter()
 	congif.VariveisAm()
 
 	//usuario
 	router.HandleFunc("/usuario", rest.HandlerUsuario)
-	router.HandleFunc("/usuario/{id}", rest.HandlerUsuario)
-	router.HandleFunc("/usuario/{id}", rest.BuscaUsuarioById)
+	router.HandleFunc("/usuario/put/{id}", rest.HandlerUsuario)
+	router.HandleFunc("/usuario/{id}", midllewares.Authentic(rest.BuscaUsuarioById))
 
 	//login
 	router.HandleFunc("/login", rest.HandlerLogin)

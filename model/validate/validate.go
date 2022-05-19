@@ -1,12 +1,14 @@
 package validate
 
 import (
+	congif "ec2/model/config"
 	usuario "ec2/model/modelos"
 	"errors"
 	"regexp"
 	"strings"
 	"time"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -36,7 +38,7 @@ func validateCampo(user *usuario.Usuario, valida string) error {
 		return errors.New("campo email tem que ser preenchido")
 	}
 
-	if valida == "inserir" {
+	if valida == "inserir" || valida == "atualiza" {
 		err := IsEmailValid(user.Email)
 		if !err {
 			return errors.New("o email informado é invalido")
@@ -83,4 +85,18 @@ func Hash(password string) (string, error) {
 func CheckPasswordHash(password, hash string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err // nota erro for == nil , e true e != nil é false
+}
+
+func TokenValid(id int64) (string, error) {
+	permissoes := jwt.MapClaims{}
+	permissoes["authorized"] = true
+	permissoes["exp"] = time.Now().Add(time.Hour * 12).Unix()
+	permissoes["id"] = id
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissoes)
+
+	validToken, err := token.SignedString([]byte(congif.SECRET))
+	if err != nil {
+		return "", nil
+	}
+	return validToken, nil
 }

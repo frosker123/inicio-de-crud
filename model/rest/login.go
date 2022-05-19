@@ -56,5 +56,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loggers.ResponseJson(w, http.StatusOK, "login feito com sucesso")
+	token, err := validate.TokenValid(userdb.ID)
+	if err != nil {
+		err = errors.New("erro ao validar token de usuario")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	loggers.ResponseJson(w, http.StatusOK, token)
+
 }

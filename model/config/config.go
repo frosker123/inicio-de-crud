@@ -14,6 +14,7 @@ var (
 	HOST     = ""
 	DB_USER  = ""
 	DB_NAME  = ""
+	SECRET   = ""
 )
 
 func VariveisAm() {
@@ -44,5 +45,7 @@ func VariveisAm() {
 	DB_NAME = os.Getenv("DB_NAME")
 
 	DB_USER = os.Getenv("DB_USER")
+
+	SECRET = os.Getenv("SECRET")
 
 }

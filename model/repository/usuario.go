@@ -23,8 +23,8 @@ func (repo repositorio) Create(user usuario.Usuario) (int64, error) {
 	return user.ID, nil
 }
 
-func (repo repositorio) Get(nikeouName string) ([]usuario.Usuario, error) {
-	nikeouName = fmt.Sprintf("%%s%%")
+func (repo repositorio) GetUser(nikeouName string) ([]usuario.Usuario, error) {
+	nikeouName = fmt.Sprintf("%%%s%%", nikeouName)
 	var usuarios []usuario.Usuario
 
 	row, err := repo.db.Query("select id, nome, username, email, created_at from usuarios.usuarios where nome like $1 or username like $2", nikeouName, nikeouName)
@@ -62,11 +62,6 @@ func (repo repositorio) GetbyId(id int64) (usuario.Usuario, error) {
 		); err != nil {
 			return usuario.Usuario{}, nil
 		}
-	}
-
-	if user.ID == 0 {
-		return usuario.Usuario{}, err
-
 	}
 
 	return user, nil

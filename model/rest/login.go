@@ -5,6 +5,7 @@ import (
 	"ec2/model/loggers"
 	usuario "ec2/model/modelos"
 	repositorio "ec2/model/repository"
+	"ec2/model/token"
 	"ec2/model/validate"
 	"encoding/json"
 	"errors"
@@ -56,13 +57,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := validate.TokenValid(userdb.ID)
+	token, err := token.CreateToken(userdb.ID)
 	if err != nil {
 		err = errors.New("erro ao validar token de usuario")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
 
-	loggers.ResponseJson(w, http.StatusOK, token)
+	loggers.ResponseText(w, http.StatusOK, token)
 
 }

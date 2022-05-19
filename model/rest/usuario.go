@@ -74,7 +74,7 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 }
 
 func BuscaUsuario(w http.ResponseWriter, r *http.Request) {
-	nikeouName := strings.ToLower(r.URL.Query().Get("user"))
+	nikeouName := strings.ToLower(r.URL.Query().Get("usuario"))
 
 	db, err := service.ConectaDB()
 	if err != nil {
@@ -84,9 +84,15 @@ func BuscaUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repository := repositorio.NewRepositorio(db)
-	querier, err := repository.Get(nikeouName)
+	querier, err := repository.GetUser(nikeouName)
 	if err != nil {
 		err = errors.New("erro no filtro de usuario")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if querier == nil {
+		err = errors.New("usuario/s informado nao encontrado")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
@@ -117,6 +123,12 @@ func BuscaUsuarioById(w http.ResponseWriter, r *http.Request) {
 	buscabyID, err := repository.GetbyId(id)
 	if err != nil {
 		err = errors.New("erro ao achar id do usuario")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if buscabyID.ID == 0 {
+		err = errors.New("id informado nao existe")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}

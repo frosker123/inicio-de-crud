@@ -14,7 +14,7 @@ var (
 	HOST     = ""
 	DB_USER  = ""
 	DB_NAME  = ""
-	SECRET   = ""
+	SECRET   []byte
 )
 
 func VariveisAm() {
@@ -46,6 +46,6 @@ func VariveisAm() {
 
 	DB_USER = os.Getenv("DB_USER")
 
-	SECRET = os.Getenv("SECRET")
+	SECRET = []byte(os.Getenv("SECRET"))
 
 }

@@ -13,12 +13,6 @@ import (
 	"net/http"
 )
 
-func HandlerLogin(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		Login(w, r)
-	}
-}
-
 func Login(w http.ResponseWriter, r *http.Request) {
 	var user usuario.Usuario
 	body, err := ioutil.ReadAll(r.Body)
@@ -50,16 +44,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	login := validate.CheckPasswordHash(user.Password, userdb.Password)
-	if login != nil {
-		err = errors.New("erro ao fazer login: senha incorreta")
+	logar := validate.CheckPasswordHash(user.Password, userdb.Password)
+	if logar != true {
+		err = errors.New("senhas incorreta ")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
 
 	token, err := token.CreateToken(userdb.ID)
 	if err != nil {
-		err = errors.New("erro ao validar token de usuario")
+		err = errors.New("erro ao gerar token para usuario")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}

@@ -23,12 +23,12 @@ var rotaConfig = []Rotas{
 		URI:          "/usuario/{id}",
 		Metodo:       http.MethodGet,
 		Handlerfunc:  rest.BuscaUsuarioById,
-		Autenticacao: false,
+		Autenticacao: true,
 	}, {
 		URI:          "/usuario",
 		Metodo:       http.MethodGet,
 		Handlerfunc:  rest.BuscaUsuario,
-		Autenticacao: false,
+		Autenticacao: true,
 	}, {
 		URI:          "/login",
 		Metodo:       http.MethodPost,

@@ -11,10 +11,9 @@ func Authentic(next http.HandlerFunc) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := token.Tokenvalid(r); err != true {
-			loggers.ResponseErrors(w, http.StatusInternalServerError, errors.New("token nao é valido"))
+			loggers.ResponseErrors(w, http.StatusInternalServerError, errors.New("token invalido"))
 			return
 		}
-
 		next(w, r)
 	}
 }

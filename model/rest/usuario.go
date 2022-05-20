@@ -5,9 +5,11 @@ import (
 	"ec2/model/loggers"
 	usuario "ec2/model/modelos"
 	repositorio "ec2/model/repository"
+	"ec2/model/token"
 	"ec2/model/validate"
 	"encoding/json"
 	"errors"
+
 	"io"
 	"net/http"
 	"strconv"
@@ -15,21 +17,6 @@ import (
 
 	"github.com/gorilla/mux"
 )
-
-func HandlerUsuario(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		InserirUsuario(w, r)
-	}
-
-	if r.Method == http.MethodGet {
-		BuscaUsuario(w, r)
-	}
-
-	if r.Method == http.MethodPut {
-		PutUsuario(w, r)
-	}
-
-}
 
 func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 	var user usuario.Usuario
@@ -55,7 +42,7 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 	db, err := service.ConectaDB()
 	if err != nil {
 		err = errors.New("erro conectar no db")
-		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		loggers.ResponseErrors(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -79,7 +66,7 @@ func BuscaUsuario(w http.ResponseWriter, r *http.Request) {
 	db, err := service.ConectaDB()
 	if err != nil {
 		err = errors.New("erro conectar no db")
-		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		loggers.ResponseErrors(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -116,7 +103,7 @@ func BuscaUsuarioById(w http.ResponseWriter, r *http.Request) {
 	db, err := service.ConectaDB()
 	if err != nil {
 		err = errors.New("erro ao conectar no banco")
-		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		loggers.ResponseErrors(w, http.StatusInternalServerError, err)
 		return
 	}
 	repository := repositorio.NewRepositorio(db)
@@ -142,11 +129,19 @@ func BuscaUsuarioById(w http.ResponseWriter, r *http.Request) {
 func PutUsuario(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	att := usuario.Usuario{
-		Nome:     r.FormValue("nome"),
-		UserName: r.FormValue("username"),
-		Email:    r.FormValue("email"),
-		Password: r.FormValue("password"),
+	var user usuario.Usuario
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		err = errors.New("erro ao ler o body")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		err = errors.New("erro ao fazer unmarshal")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
 	}
 
 	id := params["id"]
@@ -158,20 +153,33 @@ func PutUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := service.ConectaDB()
+	idToken, err := token.TokenIdUser(r)
 	if err != nil {
-		err = errors.New("erro ao conectar no banco")
-		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		err = errors.New("erro no id do token")
+		loggers.ResponseErrors(w, http.StatusUnauthorized, err)
 		return
 	}
 
-	if err = validate.Valid(&att, "atualiza"); err != nil {
+	if idToken != idUser {
+		err = errors.New("usuario nao pode atualizar esse perfil")
+		loggers.ResponseErrors(w, http.StatusForbidden, err)
+		return
+	}
+
+	db, err := service.ConectaDB()
+	if err != nil {
+		err = errors.New("erro ao conectar no banco")
+		loggers.ResponseErrors(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err = validate.Valid(&user, "atualiza"); err != nil {
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
 
 	repository := repositorio.NewRepositorio(db)
-	err = repository.AttUser(idUser, att)
+	err = repository.AttUser(idUser, user)
 	if err != nil {
 		err = errors.New("erro ao atualizar usuario")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)

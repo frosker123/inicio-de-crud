@@ -24,19 +24,19 @@ func Valid(user *usuario.Usuario, valida string) error {
 
 func validateCampo(user *usuario.Usuario, valida string) error {
 
-	if valida == "inserir" && user.Nome == "" {
+	if user.Nome == "" {
 		return errors.New("campo nome tem que ser preenchido")
 	}
 
-	if valida == "inserir" && user.UserName == "" {
+	if user.UserName == "" {
 		return errors.New("campo user name tem que ser preenchido")
 	}
 
-	if valida == "inserir" && user.Email == "" {
+	if user.Email == "" {
 		return errors.New("campo email tem que ser preenchido")
 	}
 
-	if valida == "inserir" || valida == "atualiza" {
+	if valida == "inserir" {
 		err := IsEmailValid(user.Email)
 		if !err {
 			return errors.New("o email informado é invalido")
@@ -82,5 +82,5 @@ func Hash(password string) (string, error) {
 }
 func CheckPasswordHash(password, hash string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err // nota erro for == nil , e true e != nil é false
+	return err
 }

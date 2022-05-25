@@ -46,12 +46,11 @@ func validateCampo(user *usuario.Usuario, valida string) error {
 	if valida == "inserir" && user.Password == "" {
 		return errors.New("campo senha tem que ser preenchido")
 	}
-
-	senha, e := Hash(user.Password)
+	senha, e := HashPassword(user.Password)
 	if e != nil {
 		return errors.New("senha criptografada ")
 	}
-	user.Password = senha
+	user.Password = string(senha)
 
 	user.DataCriacao = time.Now()
 
@@ -64,6 +63,15 @@ func formate(valida string) error {
 	user.Email = strings.TrimSpace(user.Email)
 	user.Nome = strings.TrimSpace(user.Nome)
 
+	if valida == "inserir" {
+		newSenha, err := HashPassword(user.Password)
+		if err != nil {
+			return err
+		}
+
+		user.Password = newSenha
+	}
+
 	return nil
 }
 
@@ -72,15 +80,18 @@ func IsEmailValid(email string) bool {
 	return emailRegex.MatchString(email)
 }
 
-func Hash(password string) (string, error) {
-
+func HashPassword(password string) (string, error) {
 	senha, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", nil
 	}
 	return string(senha), nil
 }
-func CheckPasswordHash(password, hash string) error {
+
+func CheckPasswordHash(hash, password string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		return errors.New("senha nao bate com do hash")
+	}
 	return err
 }

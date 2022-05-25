@@ -1,6 +1,7 @@
 package router
 
 import (
+	"ec2/model/midllewares"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,7 +18,12 @@ func ConfiguraRotas(r *mux.Router) *mux.Router {
 	rotas := rotaConfig
 
 	for _, rota := range rotas {
-		r.HandleFunc(rota.URI, rota.Handlerfunc).Methods(rota.Metodo)
+		if rota.Autenticacao {
+			r.HandleFunc(rota.URI, midllewares.Authentic(rota.Handlerfunc)).Methods(rota.Metodo)
+		} else {
+			r.HandleFunc(rota.URI, rota.Handlerfunc).Methods(rota.Metodo)
+
+		}
 	}
 
 	return r

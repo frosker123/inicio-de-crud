@@ -137,6 +137,7 @@ func PutUsuario(w http.ResponseWriter, r *http.Request) {
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}
+
 	err = json.Unmarshal(body, &user)
 	if err != nil {
 		err = errors.New("erro ao fazer unmarshal")
@@ -187,4 +188,84 @@ func PutUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	loggers.ResponseJson(w, http.StatusOK, "usuario atualizado :)")
+}
+
+func PutPassword(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var user usuario.Usuario
+
+	idToken, err := token.TokenIdUser(r)
+	if err != nil {
+		err = errors.New("erro no id do token")
+		loggers.ResponseErrors(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	id := params["id"]
+
+	idUser, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		err = errors.New("erro ao converter id para um int")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if idToken != idUser {
+		err = errors.New("usuario nao pode atualizar esse perfil")
+		loggers.ResponseErrors(w, http.StatusForbidden, err)
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		err = errors.New("erro ao ler o body")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		err = errors.New("erro ao fazer unmarshal")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err := service.ConectaDB()
+	if err != nil {
+		err = errors.New("erro ao conectar no banco")
+		loggers.ResponseErrors(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	repository := repositorio.NewRepositorio(db)
+	senhadoDB, err := repository.GetPass(idUser)
+	if err != nil {
+		err = errors.New("erro ao obter senha")
+		loggers.ResponseErrors(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	err = validate.CheckPasswordHash(senhadoDB, user.Password)
+	if err != nil {
+		err = errors.New("senha nao é a mesma do banco")
+		loggers.ResponseErrors(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	senhacomHash, err := validate.HashPassword(user.NewPassword)
+	if err != nil {
+		err = errors.New("erro ao criptografar senha ")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = repository.AttPass(idUser, string(senhacomHash))
+	if err != nil {
+		err = errors.New("erro ao atualizar senha")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	loggers.ResponseText(w, http.StatusOK, "senha atualizada")
+
 }

@@ -44,9 +44,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logar := validate.CheckPasswordHash(user.Password, userdb.Password)
-	if logar != true {
-		err = errors.New("senhas incorreta ")
+	check := validate.CheckPasswordHash(userdb.Password, user.Password)
+	if check != nil {
+		check = errors.New("senha incorreta")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
 		return
 	}

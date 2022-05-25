@@ -34,5 +34,10 @@ var rotaConfig = []Rotas{
 		Metodo:       http.MethodPost,
 		Handlerfunc:  rest.Login,
 		Autenticacao: false,
+	}, {
+		URI:          "/usuario_senha/{id}",
+		Metodo:       http.MethodPost,
+		Handlerfunc:  rest.PutPassword,
+		Autenticacao: true,
 	},
 }

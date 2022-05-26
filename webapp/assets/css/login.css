@@ -1,0 +1,94 @@
+*{
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+
+}
+
+.bg{
+    background-image: url("/assets/images/hack.jpg");
+    background-size: cover;
+}
+
+a{
+    font-size: 12px;
+    padding: 2 5;
+    color: green;
+}
+
+a:houver{
+    text-decoration: none;
+}
+
+input{
+    outline: none;
+    border: none;
+    line-height: 1.2;
+    font-size: 18px;
+    text-align: center;
+    display: block;
+    width: 100%;
+    background: transparent;
+    height: 0;
+    padding: 20px 0 20px 0;
+}
+
+input::placeholder{
+    color: greenyellow;
+
+}
+
+.container-login{
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.container-login > div{
+    width: 400px;
+    background:transparent;
+    border-radius: 10px;
+    position: relative;
+    padding: 100px 0 100px 0;
+}
+
+.login-form > span{
+    font-size: 30px;
+    color: greenyellow;
+    line-height: 1.6;
+    text-align: center;
+    width: 100%;
+    display: block;
+    padding-bottom: 30px;
+
+}
+
+.login-form > div{
+    width: 100%;
+    position: relative;
+    background-color: rgb(123, 133, 111);
+    border-radius: 1;
+    border-color: seashell;
+    margin-bottom: 12px;
+}
+
+.bnt-login{
+    font-size: 18px;
+    color: beige;
+    line-height: 1.4;
+    padding: 10px 0 10px 0;
+    width: 100%;
+    background-color: greenyellow;
+    outline: none;
+    border: rgb(183, 211, 168);
+    border-radius: 1;
+}
+
+.bnt-login:hover{
+    cursor: pointer;
+}

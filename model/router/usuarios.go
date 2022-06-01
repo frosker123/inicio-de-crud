@@ -8,7 +8,7 @@ import (
 var rotaConfig = []Rotas{
 	{
 
-		URI:          "/usuario",
+		URI:          "/criausuario",
 		Metodo:       http.MethodPost,
 		Handlerfunc:  rest.InserirUsuario,
 		Autenticacao: false,

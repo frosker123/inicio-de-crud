@@ -16,7 +16,7 @@ func ResponseJson(w http.ResponseWriter, statuscode int, dados interface{}) {
 
 	if dados != nil {
 		if err := json.NewEncoder(w).Encode(dados); err != nil {
-			log.Fatal(err)
+			log.Fatal("erro no encode")
 		}
 	}
 }

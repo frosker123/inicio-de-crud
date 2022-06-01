@@ -46,10 +46,12 @@ func validateCampo(user *usuario.Usuario, valida string) error {
 	if valida == "inserir" && user.Password == "" {
 		return errors.New("campo senha tem que ser preenchido")
 	}
+
 	senha, e := HashPassword(user.Password)
 	if e != nil {
-		return errors.New("senha criptografada ")
+		return errors.New("senha nao  criptografada ")
 	}
+
 	user.Password = string(senha)
 
 	user.DataCriacao = time.Now()

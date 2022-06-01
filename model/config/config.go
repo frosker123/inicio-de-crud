@@ -1,6 +1,7 @@
 package congif
 
 import (
+	"log"
 	"os"
 	"strconv"
 
@@ -22,22 +23,22 @@ func VariveisAm() {
 
 	err = gotenv.Load("../.env")
 	if err != nil {
-		panic(err)
+		log.Fatal("erro variavel")
 	}
 
 	DB_PORT, err = strconv.Atoi(os.Getenv("DB_PORT"))
 	if err != nil {
-		panic(err)
+		log.Fatal("erro variavel")
 	}
 
 	PASSWORD, err = strconv.Atoi(os.Getenv("PASSWORD"))
 	if err != nil {
-		panic(err)
+		log.Fatal("erro variavel")
 	}
 
 	API_PORT, err = strconv.Atoi(os.Getenv("API_PORT"))
 	if err != nil {
-		panic(err)
+		log.Fatal("erro variavel")
 	}
 
 	HOST = os.Getenv("HOST")

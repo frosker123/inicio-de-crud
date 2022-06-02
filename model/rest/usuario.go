@@ -47,6 +47,20 @@ func InserirUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repository := repositorio.NewRepositorio(db)
+	querier, err := repository.GetUser(user.UserName)
+	if err != nil {
+		err = errors.New("erro no filtro de usuario")
+		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	for _, v := range querier {
+		if user.UserName == v.UserName && user.Email == v.Email {
+			err = errors.New("username ou email ja esta em uso")
+			loggers.ResponseErrors(w, http.StatusBadRequest, err)
+			return
+		}
+	}
 	_, err = repository.Create(user)
 	if err != nil {
 		err = errors.New("erro ao criar usuario")

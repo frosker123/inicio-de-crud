@@ -6,6 +6,7 @@ import (
 	usuario "ec2/model/modelos"
 	repositorio "ec2/model/repository"
 	"ec2/model/token"
+	"ec2/model/validate"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -40,6 +41,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		err = errors.New("erro email nao cadastrado")
 		loggers.ResponseErrors(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = validate.CheckPasswordHash(userdb.Password, user.Password)
+	if err != nil {
+		err = errors.New("erro senhas nao batem")
+		loggers.ResponseErrors(w, http.StatusInternalServerError, err)
 		return
 	}
 
